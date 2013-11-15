@@ -135,7 +135,11 @@ static CGRect GKScaleRect(CGRect rect, CGFloat scale)
         scale = (self.imageToCrop.size.width < self.imageToCrop.size.height ?
                  MAX(scaleWidth, scaleHeight) :
                  MIN(scaleWidth, scaleHeight));
-    }else{
+    }
+    else if (self.cropSize.width == self.cropSize.height) {
+        scale = MAX(scaleWidth, scaleHeight);
+    }
+    else {
         scale = (self.imageToCrop.size.width < self.imageToCrop.size.height ?
                  MIN(scaleWidth, scaleHeight) :
                  MAX(scaleWidth, scaleHeight));
@@ -199,6 +203,9 @@ static CGRect GKScaleRect(CGRect rect, CGFloat scale)
     return self;
 }
 
+- (void) dealloc {
+    self.scrollView.delegate = nil;
+}
 
 - (UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event{
     if (!self.resizableCropArea)
@@ -257,6 +264,12 @@ static CGRect GKScaleRect(CGRect rect, CGFloat scale)
     self.scrollView.frame = CGRectMake(xOffset, yOffset, size.width, size.height);
     self.scrollView.contentSize = CGSizeMake(size.width, size.height);
     self.imageView.frame = CGRectMake(0, floor((size.height - faktoredHeight) * 0.5), faktoredWidth, faktoredHeight);
+    
+    CGSize sz = self.imageView.image.size;
+    if (sz.width != sz.height) {
+        float scale = MAX(sz.width, sz.height) / MIN(sz.width, sz.height);
+        self.scrollView.minimumZoomScale = self.scrollView.zoomScale = scale;
+    }
 }
 
 #pragma mark -
