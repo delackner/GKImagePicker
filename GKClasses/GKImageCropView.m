@@ -265,11 +265,12 @@ static CGRect GKScaleRect(CGRect rect, CGFloat scale)
     self.scrollView.contentSize = CGSizeMake(size.width, size.height);
     self.imageView.frame = CGRectMake(0, floor((size.height - faktoredHeight) * 0.5), faktoredWidth, faktoredHeight);
     
+    // Limit crop to not have any empty space
     CGSize sz = self.imageView.image.size;
-    if (sz.width != sz.height) {
-        float scale = MAX(sz.width, sz.height) / MIN(sz.width, sz.height);
-        self.scrollView.minimumZoomScale = self.scrollView.zoomScale = scale;
-    }
+    CGSize csz = self.cropSize;
+    float byWidth = (sz.width / sz.height) / (csz.width / csz.height);
+    float byHeight = (sz.height / sz.width) / (csz.height / csz.width);
+    self.scrollView.minimumZoomScale = self.scrollView.zoomScale = MAX(byWidth, byHeight);
 }
 
 #pragma mark -
