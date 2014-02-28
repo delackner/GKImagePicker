@@ -6,6 +6,8 @@
 //  Copyright (c) 2012 Aurora Apps. All rights reserved.
 //
 
+#import "UIImageView+GeometryConversion.h"
+
 #import "GKImageCropView.h"
 #import "GKImageCropOverlayView.h"
 #import "GKResizeableCropOverlayView.h"
@@ -132,7 +134,7 @@ static CGRect GKScaleRect(CGRect rect, CGFloat scale)
     CGFloat scale = 0.0f;
     
     if (self.cropSize.width > self.cropSize.height) {
-        scale = (self.imageToCrop.size.width < self.imageToCrop.size.height ?
+        scale = (self.imageToCrop.size.width <= self.imageToCrop.size.height ?
                  MAX(scaleWidth, scaleHeight) :
                  MIN(scaleWidth, scaleHeight));
     }
@@ -146,9 +148,9 @@ static CGRect GKScaleRect(CGRect rect, CGFloat scale)
     }
     //extract visible rect from scrollview and scale it
     CGRect visibleRect = [scrollView convertRect:scrollView.bounds toView:imageView];
-    return visibleRect = GKScaleRect(visibleRect, scale);
+    visibleRect = [imageView convertRectFromView: visibleRect];
+    return visibleRect;
 }
-
 
 - (CGAffineTransform)_orientationTransformedRectOfImage:(UIImage *)img
 {
@@ -268,9 +270,17 @@ static CGRect GKScaleRect(CGRect rect, CGFloat scale)
     // Limit crop to not have any empty space
     CGSize sz = self.imageView.image.size;
     CGSize csz = self.cropSize;
-    float byWidth = (sz.width / sz.height) / (csz.width / csz.height);
-    float byHeight = (sz.height / sz.width) / (csz.height / csz.width);
-    self.scrollView.minimumZoomScale = self.scrollView.zoomScale = MAX(byWidth, byHeight);
+    float z = 1.f;
+    
+    if (sz.width > sz.height && csz.width > csz.height && sz.height < csz.height) {
+        z = 1.f;
+    }
+    else {
+        float byWidth = (sz.width / sz.height) / (csz.width / csz.height);
+        float byHeight = (sz.height / sz.width) / (csz.height / csz.width);
+        z = MAX(byWidth, byHeight);
+    }
+    self.scrollView.minimumZoomScale = self.scrollView.zoomScale = z;
 }
 
 #pragma mark -
