@@ -101,11 +101,13 @@
     
     if (floor(NSFoundationVersionNumber) > NSFoundationVersionNumber_iOS_6_1) {
         self.useButton = [UIButton buttonWithType:UIButtonTypeCustom];
-		
-        [[self.useButton titleLabel] setFont:[UIFont boldSystemFontOfSize:16]];
-        [[self.useButton titleLabel] setShadowOffset:CGSizeMake(0, -1)];
-        [self.useButton setFrame:CGRectMake(0, 0, 58, 30)];
-        [self.useButton setTitle:NSLocalizedString(@"GKIuse",@"") forState:UIControlStateNormal];
+		UILabel* lbl = self.useButton.titleLabel;
+        [lbl setFont:[UIFont boldSystemFontOfSize:16]];
+        [lbl setShadowOffset:CGSizeMake(0, -1)];
+        NSString* s = NSLocalizedString(@"GKIuse",@"");
+        int w = ceilf([s sizeWithFont: lbl.font].width);
+        [self.useButton setFrame:CGRectMake(0, 0, w, 30)];
+        [self.useButton setTitle:s forState:UIControlStateNormal];
         [self.useButton setTitleShadowColor:[UIColor colorWithRed:0.118 green:0.247 blue:0.455 alpha:1] forState:UIControlStateNormal];
         [self.useButton  addTarget:self action:@selector(_actionUse) forControlEvents:UIControlEventTouchUpInside];
     } else {
